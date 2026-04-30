@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jurassic Park Dinosaur Cards</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Orbitron', sans-serif; 
+            background: #0a2e1d; /* Dark jungle green */
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px; 
+            position: relative;
+            overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(10, 46, 29, 0.8) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(10, 46, 29, 0.6) 0%, transparent 20%),
+                linear-gradient(45deg, #0a2e1d 25%, #1a472a 25%, #1a472a 50%, #0a2e1d 50%, #0a2e1d 75%, #1a472a 75%, #1a472a);
+            background-size: 100px 100px;
+        }
+        
+        /* Jurassic Park grid pattern */
+        .grid-pattern {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+        
+        @keyframes gridMove {
+            0% { transform: translateY(0) translateX(0); }
+            100% { transform: translateY(50px) translateX(50px); }
+        }
+        
+        /* Security fence effect */
+        .fence {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 40px,
+                rgba(255, 215, 0, 0.1) 40px,
+                rgba(255, 215, 0, 0.1) 41px
+            );
+            z-index: -1;
+            pointer-events: none;
+        }
+        
+        /* Warning lights */
+        .warning-light {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff0000;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ff0000;
+            animation: warningBlink 2s infinite;
+            z-index: -1;
+        }
+        
+        .warning-light:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .warning-light:nth-child(2) { top: 10%; right: 5%; animation-delay: 0.5s; }
+        .warning-light:nth-child(3) { bottom: 10%; left: 5%; animation-delay: 1s; }
+        .warning-light:nth-child(4) { bottom: 10%; right: 5%; animation-delay: 1.5s; }
+        
+        @keyframes warningBlink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        
+        .container { 
+            max-width: 850px; /* Increased width */
+            width: 100%; 
+            text-align: center; 
+            z-index: 1;
+            background: rgba(0, 0, 0, 0.7);
+            border: 3px solid #ffd700;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 
+                0 0 30px rgba(255, 215, 0, 0.3),
+                inset 0 0 30px rgba(255, 215, 0, 0.1);
+        }
+        
+        .header { 
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+            background: linear-gradient(90deg, #1a472a, #2d5a3d, #1a472a);
+            border: 2px solid #ffd700;
+            border-radius: 8px;
+        }
+        
+        .header h1 { 
+            font-family: 'Bebas Neue', cursive;
+            font-size: 3.5rem;
+            color: #ffd700;
+            text-shadow: 
+                0 0 10px #ffd700,
+                0 0 20px #ffd700,
+                3px 3px 0 #000;
+            margin-bottom: 10px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            background: linear-gradient(45deg, #ffd700, #fff, #ffd700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes titleGlow {
+            0% { 
+                text-shadow: 
+                    0 0 10px #ffd700,
+                    0 0 20px #ffd700,
+                    3px 3px 0 #000;
+            }
+            100% { 
+                text-shadow: 
+                    0 0 20px #ffd700,
+                    0 0 40px #ffd700,
+                    0 0 60px #ffd700,
+                    3px 3px 0 #000;
+            }
+        }
+        
+        .header p {
+            color: #4ade80;
+            font-size: 1.1rem;
+            text-shadow: 0 0 5px #4ade80;
+            font-weight: bold;
+        }
+        
+        /* FLASHCARD CONTAINER - Increased height for scroll */
+        .flashcard-container { 
+            position: relative; 
+            width: 100%; 
+            height: 600px; /* Increased height */
+            margin-bottom: 20px; 
+            perspective: 1000px; 
+        }
+        
+        .flashcard { 
+            width: 100%; 
+            height: 100%; 
+            position: absolute; 
+            transform-style: preserve-3d; 
+            transition: transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            cursor: pointer; 
+        }
+        
+        .flashcard.flipped { transform: rotateY(180deg); }
+        
+        .card-front, .card-back { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            backface-visibility: hidden; 
+            border-radius: 15px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-start; 
+            align-items: center; 
+            padding: 20px; 
+            overflow: hidden;
+        }
+        
+        /* Card front - Jurassic Park Theme */
+        .card-front { 
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #1a472a 100%);
+            border: 4px solid #ffd700;
+            box-shadow: 
+                0 0 20px rgba(255, 215, 0, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Card back - Lab Theme with SCROLL */
+        .card-back { 
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #1e293b 100%);
+            transform: rotateY(180deg); 
+            border: 4px solid #3b82f6;
+            box-shadow: 
+                0 0 20px rgba(59, 130, 246, 0.5),
+                inset 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Card content wrapper for scroll */
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto; /* Vertical scroll */
+            padding-right: 10px; /* Space for scrollbar */
+        }
+        
+        /* Custom scrollbar */
+        .card-content::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .card-content::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+        }
+        
+        .card-content::-webkit-scrollbar-thumb {
+            background: linear-gradient(to bottom, #3b82f6, #1d4ed8);
+            border-radius: 5px;
+            border: 2px solid rgba(0, 0, 0, 0.3);
+        }
+        
+        .card-content::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(to bottom, #60a5fa, #3b82f6);
+        }
+        
+        /* DINOSAUR IMAGE - LARGER FRAME */
+        .dino-image { 
+            width: 400px; /* Increased width */
+            height: 280px; /* Increased height */
+            margin: 15px 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            border-radius: 12px; 
+            background: rgba(0, 0, 0, 0.6);
+            overflow: hidden; 
+            cursor: pointer; 
+            border: 3px solid #ffd700;
+            position: relative;
+        }
+        
+        .dino-image::before {
+            content: 'SPECIMEN';
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #ff0000;
+            color: white;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            border-radius: 3px;
+            font-weight: bold;
+            z-index: 2;
+        }
+        
+        .dino-image img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: contain; /* Keep entire image visible */
+            border-radius: 10px; 
+            transition: all 0.3s ease; 
+            background: rgba(0, 0, 0, 0.3); /* Background for transparency */
+        }
+        
+        .dino-image img.pop { 
+            animation: popAnimation 0.5s; 
+        }
+        
+        @keyframes popAnimation { 
+            0% { transform: scale(1); } 
+            50% { transform: scale(1.1) rotate(1deg); } 
+            75% { transform: scale(1.05) rotate(-1deg); } 
+            100% { transform: scale(1); } 
+        }
+        
+        /* Text elements */
+        .letter { 
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.5rem; 
+            font-weight: bold; 
+            color: #ffd700; 
+            text-shadow: 2px 2px 0 #000;
+            margin: 5px 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: 1px solid #ffd700;
+        }
+        
+        .dino-name { 
+            font-family: 'Bebas Neue', cursive;
+            font-size: 1.8rem; 
+            font-weight: bold; 
+            color: #4ade80; 
+            text-shadow: 2px 2px 0 #000;
+            margin: 5px 0; 
+            background: rgba(0, 0, 0, 0.7);
+            padding: 5px 15px;
+            border-radius: 5px;
+            border: 1px solid #4ade80;
+        }
+        
+        /* Sound buttons */
+        .sound-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin: 15px 0;
+            width: 95%;
+        }
+        
+        .sound-btn {
+            background: linear-gradient(145deg, #1e40af, #1d4ed8);
+            border: none;
+            padding: 12px;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 0 #1e3a8a;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .sound-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #1e3a8a;
+            background: linear-gradient(145deg, #1d4ed8, #2563eb);
+        }
+        
+        .sound-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #1e3a8a;
+        }
+        
+        .sound-btn.name-btn {
+            background: linear-gradient(145deg, #047857, #059669);
+            box-shadow: 0 4px 0 #065f46;
+        }
+        
+        .sound-btn.name-btn:hover {
+            background: linear-gradient(145deg, #059669, #10b981);
+        }
+        
+        .sound-btn.fact-btn {
+            background: linear-gradient(145deg, #7c3aed, #8b5cf6);
+            box-shadow: 0 4px 0 #5b21b6;
+        }
+        
+        .sound-btn.fact-btn:hover {
+            background: linear-gradient(145deg, #8b5cf6, #a78bfa);
+        }
+        
+        .sound-btn.diet-btn {
+            background: linear-gradient(145deg, #dc2626, #ef4444);
+            box-shadow: 0 4px 0 #b91c1c;
+        }
+        
+        .sound-btn.diet-btn:hover {
+            background: linear-gradient(145deg, #ef4444, #f87171);
+        }
+        
+        .sound-btn.soundout-btn {
+            background: linear-gradient(145deg, #f59e0b, #fbbf24);
+            box-shadow: 0 4px 0 #d97706;
+            animation: pulse 2s infinite;
+            color: #000;
+        }
+        
+        .sound-btn.soundout-btn:hover {
+            background: linear-gradient(145deg, #fbbf24, #fcd34d);
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .dino-fact, .dino-diet { 
+            font-size: 1rem; 
+            line-height: 1.4; 
+            margin: 8px 0; 
+            padding: 10px 15px; 
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            border-left: 3px solid #3b82f6;
+            color: #e2e8f0;
+            max-width: 95%;
+        }
+        
+        .dino-diet {
+            border-left-color: #10b981;
+        }
+        
+        /* Sound-out display */
+        .soundout-bubble {
+            background: linear-gradient(145deg, #1e293b, #334155);
+            color: #fbbf24;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin: 10px 0;
+            border: 2px solid #fbbf24;
+            font-family: 'Orbitron', sans-serif;
+            box-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .soundout-display {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 10px 0;
+            min-height: 50px;
+        }
+        
+        .soundout-part {
+            background: linear-gradient(145deg, #1e293b, #334155);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.2s ease;
+            border: 2px solid #3b82f6;
+            color: #e2e8f0;
+            min-width: 45px;
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .soundout-part:hover {
+            transform: translateY(-2px);
+            border-color: #60a5fa;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        
+        .soundout-part:active {
+            transform: translateY(1px);
+        }
+        
+        .soundout-part.active {
+            background: linear-gradient(145deg, #f59e0b, #fbbf24);
+            border-color: #f59e0b;
+            color: #000;
+            animation: bounce 0.3s ease;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .soundout-part.space {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            cursor: default;
+            color: transparent;
+            min-width: 5px;
+        }
+        
+        .soundout-instruction {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin: 5px 0;
+            font-style: italic;
+            text-align: center;
+        }
+        
+        /* Controls */
+        .controls { 
+            display: flex; 
+            justify-content: center; 
+            gap: 15px; 
+            margin-bottom: 15px; 
+            flex-wrap: wrap; 
+        }
+        
+        .control-btn { 
+            background: linear-gradient(145deg, #1e40af, #1d4ed8);
+            border: none; 
+            padding: 12px 20px; 
+            border-radius: 8px; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: all 0.3s ease; 
+            box-shadow: 0 4px 0 #1e3a8a; 
+            font-size: 1rem; 
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .control-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 0 #1e3a8a; 
+            background: linear-gradient(145deg, #1d4ed8, #2563eb);
+        }
+        
+        .control-btn:active {
+            transform: translateY(1px);
+            box-shadow: 0 2px 0 #1e3a8a;
+        }
+        
+        .card-counter { 
+            font-size: 1.1rem; 
+            color: #60a5fa; 
+            font-weight: bold; 
+            margin-top: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 15px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px solid #60a5fa;
+        }
+        
+        .instructions { 
+            font-size: 0.9rem; 
+            color: #94a3b8; 
+            margin-top: 8px;
+            text-align: center;
+        }
+        
+        /* Jurassic Park Logo */
+        .jp-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2rem;
+            color: #ffd700;
+            text-shadow: 0 0 10px #ffd700;
+            margin: 10px 0;
+            letter-spacing: 2px;
+        }
+        
+        /* DNA Strand Animation */
+        .dna-strand {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            background: 
+                radial-gradient(circle at 50% 0%, #3b82f6 2px, transparent 2px),
+                radial-gradient(circle at 50% 100%, #10b981 2px, transparent 2px);
+            background-size: 20px 40px;
+            opacity: 0.3;
+            animation: dnaFloat 20s linear infinite;
+            z-index: -1;
+        }
+        
+        .dna-strand:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .dna-strand:nth-child(2) { top: 60%; right: 10%; animation-delay: 5s; }
+        .dna-strand:nth-child(3) { bottom: 20%; left: 15%; animation-delay: 10s; }
+        
+        @keyframes dnaFloat {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100px) rotate(360deg); }
+        }
+        
+        /* Audio status indicator */
+        .audio-status {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            margin-top: 8px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background effects -->
+    <div class="grid-pattern"></div>
+    <div class="fence"></div>
+    <div class="warning-light"></div>
+    <div class="warning-light"></div>
+    <div class="warning-light"></div>
+    <div class="warning-light"></div>
+    <div class="dna-strand"></div>
+    <div class="dna-strand"></div>
+    <div class="dna-strand"></div>
+    
+    <div class="container">
+        <div class="header">
+            <div class="jp-logo">JURASSIC PARK</div>
+            <h1>DINOSAUR SPECIMENS</h1>
+            <p>CAUTION: LIVE SPECIMENS • DO NOT FEED THE ANIMALS</p>
+        </div>
+
+        <div class="flashcard-container">
+            <div class="flashcard" id="flashcard">
+                <!-- FRONT OF CARD - FIELD OBSERVATION -->
+                <div class="card-front">
+                    <div class="dino-name" id="currentName">ANKYLOSAURUS</div>
+                    
+                    <!-- DINOSAUR IMAGE -->
+                    <div class="dino-image" onclick="popDinosaur()">
+                        <img id="frontImage" src="a1.png" alt="Ankylosaurus" onerror="this.src='https://via.placeholder.com/400x280/1a472a/ffffff?text=ANKYLOSAURUS'">
+                    </div>
+                    
+                    <div class="letter" id="currentLetter">A</div>
+                    
+                    <!-- ANIMAL SOUND BUTTON -->
+                    <div class="sound-buttons">
+                        <button class="sound-btn" onclick="playAnimalSound()">
+                            🔊 SPECIMEN VOCALIZATION
+                        </button>
+                    </div>
+                    
+                    <div class="instructions">CLICK CARD FOR SPECIMEN DATA</div>
+                    <div class="audio-status" id="audioStatus">AUDIO: READY</div>
+                </div>
+                
+                <!-- BACK OF CARD - LAB DATA WITH SCROLL -->
+                <div class="card-back">
+                    <div class="card-content">
+                        <div class="dino-name" id="backName">ANKYLOSAURUS</div>
+                        
+                        <!-- DINOSAUR IMAGE -->
+                        <div class="dino-image" onclick="popDinosaur()">
+                            <img id="backImage" src="a1.png" alt="Ankylosaurus" onerror="this.src='https://via.placeholder.com/400x280/1a472a/ffffff?text=ANKYLOSAURUS'">
+                        </div>
+                        
+                        <!-- SOUND BUTTONS -->
+                        <div class="sound-buttons">
+                            <button class="sound-btn name-btn" onclick="speakNameSlowly()">
+                                🔊 SPECIMEN ID
+                            </button>
+                            <button class="sound-btn fact-btn" onclick="speakDescription()">
+                                📊 FIELD OBSERVATIONS
+                            </button>
+                            <button class="sound-btn diet-btn" onclick="speakDiet()">
+                                🍖 FEEDING HABITS
+                            </button>
+                            <button class="sound-btn soundout-btn" onclick="soundOutDinoName()">
+                                🔬 SPECIMEN ANALYSIS
+                            </button>
+                        </div>
+                        
+                        <!-- SOUND-OUT DISPLAY -->
+                        <div class="soundout-bubble" id="soundoutText" style="display: none;">
+                            SPECIMEN ANALYSIS INITIATED
+                        </div>
+                        
+                        <div class="soundout-display" id="soundoutDisplay"></div>
+                        <div class="soundout-instruction" id="soundoutInstruction" style="display: none;">
+                            CLICK SECTIONS FOR PHONETIC ANALYSIS
+                        </div>
+                        
+                        <div class="dino-fact" id="currentFact">Armored dinosaur with a club tail for defense</div>
+                        <div class="dino-diet" id="currentDiet">HERBIVORE • DEFENSIVE</div>
+                        <div class="letter" id="backLetter">A</div>
+                        <div class="audio-status" id="backAudioStatus">AUDIO: READY</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="control-btn" onclick="prevCard()">← PREV SPECIMEN</button>
+            <button class="control-btn" onclick="toggleSound()" id="soundBtn">🔊 AUDIO ONLINE</button>
+            <button class="control-btn" onclick="nextCard()">NEXT SPECIMEN →</button>
+        </div>
+
+        <div class="card-counter">
+            SPECIMEN <span id="currentIndex">1</span> OF <span id="totalCards">7</span>
+        </div>
+        
+        <div class="instructions">
+            WARNING: SPECIMENS MAY BE DANGEROUS • MAINTAIN SAFE DISTANCE
+        </div>
+    </div>
+
+    <script>
+        // AUDIO CONTROLLER - Jurassic Park Theme - FIXED FOR NO OVERLAP
+        const AudioController = {
+            currentAudioContext: null,
+            currentOscillator: null,
+            currentSpeech: null,
+            animalSoundTimeout: null,
+            soundOutTimeout: null,
+            isPlaying: false,
+            
+            stopAllAudio() {
+                // Stop Web Audio API sounds
+                if (this.currentOscillator) {
+                    try {
+                        this.currentOscillator.stop();
+                        this.currentOscillator.disconnect();
+                    } catch (e) {}
+                    this.currentOscillator = null;
+                }
+                
+                if (this.currentAudioContext) {
+                    try {
+                        this.currentAudioContext.close();
+                    } catch (e) {}
+                    this.currentAudioContext = null;
+                }
+                
+                // Stop speech synthesis
+                if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                // Clear any timeouts
+                if (this.animalSoundTimeout) {
+                    clearTimeout(this.animalSoundTimeout);
+                    this.animalSoundTimeout = null;
+                }
+                
+                if (this.soundOutTimeout) {
+                    clearTimeout(this.soundOutTimeout);
+                    this.soundOutTimeout = null;
+                }
+                
+                // Reset sound-out highlighting
+                const parts = document.querySelectorAll('.soundout-part');
+                parts.forEach(part => part.classList.remove('active'));
+                
+                // Reset analysis display
+                document.getElementById('soundoutDisplay').innerHTML = '';
+                document.getElementById('soundoutText').style.display = 'none';
+                document.getElementById('soundoutInstruction').style.display = 'none';
+                
+                // Update status
+                this.updateAudioStatus("AUDIO: READY");
+                this.isPlaying = false;
+            },
+            
+            updateAudioStatus(status) {
+                document.getElementById('audioStatus').textContent = status;
+                document.getElementById('backAudioStatus').textContent = status;
+            },
+            
+            playSoundWithContext(soundFunction) {
+                if (!soundEnabled) return;
+                
+                // Stop any currently playing audio first
+                this.stopAllAudio();
+                
+                // Set playing status
+                this.isPlaying = true;
+                this.updateAudioStatus("AUDIO: PLAYING");
+                
+                // Play the new sound
+                soundFunction();
+                
+                // Set timeout to reset status when sound should be done
+                setTimeout(() => {
+                    if (this.isPlaying) {
+                        this.updateAudioStatus("AUDIO: READY");
+                        this.isPlaying = false;
+                    }
+                }, 3000); // Max expected sound duration
+            }
+        };
+
+        // Jurassic Park color scheme
+        const jurassicColors = [
+            { front: ['#1a472a', '#2d5a3d'], border: '#ffd700' }, // Ankylosaurus - Gold
+            { front: ['#134e4a', '#0f766e'], border: '#14b8a6' }, // Brachiosaurus - Teal
+            { front: ['#7c2d12', '#9a3412'], border: '#f97316' }, // Corythosaurus - Orange
+            { front: ['#374151', '#4b5563'], border: '#9ca3af' }, // Diplodocus - Gray
+            { front: ['#1e3a8a', '#1d4ed8'], border: '#60a5fa' }, // Edmontosaurus - Blue
+            { front: ['#581c87', '#7c3aed'], border: '#c084fc' }, // Fukuiraptor - Purple
+            { front: ['#064e3b', '#047857'], border: '#10b981' }  // Gallimimus - Green
+        ];
+
+        // 7 Dinosaurs A-G Order with CORRECT IMAGE FILENAMES
+        const dinos = [
+            {
+                letter: 'A', 
+                name: 'ANKYLOSAURUS', 
+                fact: 'Heavily armored dinosaur with a massive bony club at the end of its tail for defense.', 
+                diet: 'HERBIVORE', 
+                image: 'a1.png', // Correct
+                soundOut: ["AN", "KY", "LO", "SAUR", "US"],
+                toddlerSounds: ["Ankylosaurus!", "Armored tank!", "Club tail!", "Herbivore!"]
+            },
+            {
+                letter: 'B', 
+                name: 'BRACHIOSAURUS', 
+                fact: 'One of the tallest dinosaurs with extremely long neck to reach high vegetation.', 
+                diet: 'HERBIVORE', 
+                image: 'b1.png', // Correct (was b1.png)
+                soundOut: ["BRACH", "I", "O", "SAUR", "US"],
+                toddlerSounds: ["Brachiosaurus!", "Long neck!", "Tree eater!", "Gentle giant!"]
+            },
+            {
+                letter: 'C', 
+                name: 'CORYTHOSAURUS', 
+                fact: 'Hadrosaur with a distinctive helmet-like crest on its head used for display and sound.', 
+                diet: 'HERBIVORE', 
+                image: 'c3.png', // Correct (was c3.png)
+                soundOut: ["COR", "YTH", "O", "SAUR", "US"],
+                toddlerSounds: ["Corythosaurus!", "Helmet head!", "Duck bill!", "Crest dinosaur!"]
+            },
+            {
+                letter: 'D', 
+                name: 'DIPLODOCUS', 
+                fact: 'Extremely long sauropod with whip-like tail, one of the longest dinosaurs.', 
+                diet: 'HERBIVORE', 
+                image: 'd4.png', // Correct (was d4.png)
+                soundOut: ["DIP", "LO", "DO", "CUS"],
+                toddlerSounds: ["Diplodocus!", "Very long!", "Whip tail!", "Plant eater!"]
+            },
+            {
+                letter: 'E', 
+                name: 'EDMONTOSAURUS', 
+                fact: 'Large duck-billed dinosaur with hundreds of teeth for grinding tough plants.', 
+                diet: 'HERBIVORE', 
+                image: 'e5.png', // Correct (was e5.png)
+                soundOut: ["ED", "MON", "TO", "SAUR", "US"],
+                toddlerSounds: ["Edmontosaurus!", "Duck bill!", "Many teeth!", "Grass eater!"]
+            },
+            {
+                letter: 'F', 
+                name: 'FUKUIRAPTOR', 
+                fact: 'Medium-sized carnivorous dinosaur, fast predator with sharp claws.', 
+                diet: 'CARNIVORE', 
+                image: 'f6.png', // Correct (was f6.png)
+                soundOut: ["FU", "KUI", "RAP", "TOR"],
+                toddlerSounds: ["Fukuiraptor!", "Fast hunter!", "Sharp claws!", "Meat eater!"]
+            },
+            {
+                letter: 'G', 
+                name: 'GALLIMIMUS', 
+                fact: 'Ostrich-like dinosaur, one of the fastest runners among dinosaurs.', 
+                diet: 'OMNIVORE', 
+                image: 'g7.png', // Correct (was g7.png)
+                soundOut: ["GAL", "LI", "MI", "MUS"],
+                toddlerSounds: ["Gallimimus!", "Speed runner!", "Ostrich dinosaur!", "Very fast!"]
+            }
+        ];
+        
+        let currentCardIndex = 0;
+        let soundEnabled = true;
+        let currentSoundOutParts = [];
+
+        // JURASSIC PARK ANIMAL SOUNDS - NO OVERLAP
+        function playAnimalSound() {
+            AudioController.playSoundWithContext(() => {
+                playJurassicSound();
+            });
+        }
+
+        function playJurassicSound() {
+            if (!soundEnabled) return;
+            
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const time = audioCtx.currentTime;
+                
+                // Create main oscillator
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                
+                const dino = dinos[currentCardIndex];
+                const dinoName = dino.name;
+                const diet = dino.diet;
+                
+                // Different sounds based on diet and specific dinosaurs
+                if (dinoName.includes('ANKYLOSAURUS')) {
+                    // Ankylosaurus - deep, armored sound
+                    oscillator.type = 'sawtooth';
+                    oscillator.frequency.setValueAtTime(100, time);
+                    oscillator.frequency.exponentialRampToValueAtTime(80, time + 0.8);
+                    oscillator.frequency.exponentialRampToValueAtTime(90, time + 1.2);
+                    
+                    gainNode.gain.setValueAtTime(0, time);
+                    gainNode.gain.linearRampToValueAtTime(0.4, time + 0.3);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 1.5);
+                    
+                    oscillator.start(time);
+                    oscillator.stop(time + 1.5);
+                    
+                } else if (dinoName.includes('BRACHIOSAURUS') || dinoName.includes('DIPLODOCUS')) {
+                    // Large herbivores - deep, rumbling sounds
+                    oscillator.type = 'sine';
+                    oscillator.frequency.setValueAtTime(70, time);
+                    oscillator.frequency.exponentialRampToValueAtTime(60, time + 1);
+                    oscillator.frequency.exponentialRampToValueAtTime(65, time + 1.5);
+                    
+                    gainNode.gain.setValueAtTime(0, time);
+                    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.5);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 2);
+                    
+                    oscillator.start(time);
+                    oscillator.stop(time + 2);
+                    
+                } else if (dinoName.includes('FUKUIRAPTOR')) {
+                    // Carnivore - sharp, aggressive sounds
+                    oscillator.type = 'square';
+                    oscillator.frequency.setValueAtTime(300, time);
+                    oscillator.frequency.exponentialRampToValueAtTime(400, time + 0.3);
+                    oscillator.frequency.exponentialRampToValueAtTime(250, time + 0.6);
+                    
+                    gainNode.gain.setValueAtTime(0, time);
+                    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.8);
+                    
+                    oscillator.start(time);
+                    oscillator.stop(time + 0.8);
+                    
+                } else if (dinoName.includes('GALLIMIMUS')) {
+                    // Fast runner - quick, higher pitched
+                    oscillator.type = 'triangle';
+                    oscillator.frequency.setValueAtTime(200, time);
+                    oscillator.frequency.exponentialRampToValueAtTime(300, time + 0.2);
+                    oscillator.frequency.exponentialRampToValueAtTime(180, time + 0.4);
+                    
+                    gainNode.gain.setValueAtTime(0, time);
+                    gainNode.gain.linearRampToValueAtTime(0.25, time + 0.1);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 0.6);
+                    
+                    oscillator.start(time);
+                    oscillator.stop(time + 0.6);
+                    
+                } else {
+                    // Default herbivore sound
+                    oscillator.type = 'sine';
+                    if (diet === 'CARNIVORE') {
+                        oscillator.type = 'sawtooth';
+                        oscillator.frequency.setValueAtTime(150, time);
+                        oscillator.frequency.exponentialRampToValueAtTime(200, time + 0.5);
+                    } else {
+                        oscillator.frequency.setValueAtTime(120, time);
+                        oscillator.frequency.exponentialRampToValueAtTime(100, time + 0.7);
+                    }
+                    
+                    gainNode.gain.setValueAtTime(0, time);
+                    gainNode.gain.linearRampToValueAtTime(0.3, time + 0.2);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + 1);
+                    
+                    oscillator.start(time);
+                    oscillator.stop(time + 1);
+                }
+                
+                // Store references for stopping
+                AudioController.currentAudioContext = audioCtx;
+                AudioController.currentOscillator = oscillator;
+                
+                // Reset status when sound ends
+                setTimeout(() => {
+                    AudioController.updateAudioStatus("AUDIO: READY");
+                    AudioController.isPlaying = false;
+                }, (dinoName.includes('BRACHIOSAURUS') || dinoName.includes('DIPLODOCUS')) ? 2000 : 
+                   (dinoName.includes('ANKYLOSAURUS') ? 1500 : 
+                   (dinoName.includes('FUKUIRAPTOR') ? 800 : 1000)));
+                
+            } catch (error) {
+                console.log('Audio not supported');
+                AudioController.updateAudioStatus("AUDIO: ERROR");
+                AudioController.isPlaying = false;
+            }
+        }
+
+        // JURASSIC PARK VOICE - Authoritative and scientific
+        function speakNameSlowly() {
+            AudioController.playSoundWithContext(() => {
+                if (!soundEnabled) return;
+                
+                const dino = dinos[currentCardIndex];
+                const name = dino.name;
+                
+                if ('speechSynthesis' in window) {
+                    const speech = new SpeechSynthesisUtterance("Specimen identified as " + name);
+                    speech.rate = 0.8;
+                    speech.pitch = 1.0;
+                    speech.volume = 1;
+                    
+                    speech.onend = () => {
+                        AudioController.updateAudioStatus("AUDIO: READY");
+                        AudioController.isPlaying = false;
+                    };
+                    
+                    window.speechSynthesis.speak(speech);
+                }
+            });
+        }
+
+        // FIELD OBSERVATIONS
+        function speakDescription() {
+            AudioController.playSoundWithContext(() => {
+                if (!soundEnabled) return;
+                
+                const dino = dinos[currentCardIndex];
+                if ('speechSynthesis' in window) {
+                    const speech = new SpeechSynthesisUtterance("Field observation: " + dino.fact);
+                    speech.rate = 0.85;
+                    speech.pitch = 1.0;
+                    speech.volume = 1;
+                    
+                    speech.onend = () => {
+                        AudioController.updateAudioStatus("AUDIO: READY");
+                        AudioController.isPlaying = false;
+                    };
+                    
+                    window.speechSynthesis.speak(speech);
+                }
+            });
+        }
+
+        // FEEDING HABITS
+        function speakDiet() {
+            AudioController.playSoundWithContext(() => {
+                if (!soundEnabled) return;
+                
+                const dino = dinos[currentCardIndex];
+                if ('speechSynthesis' in window) {
+                    const speech = new SpeechSynthesisUtterance("Feeding classification: " + dino.diet);
+                    speech.rate = 0.85;
+                    speech.pitch = 1.0;
+                    speech.volume = 1;
+                    
+                    speech.onend = () => {
+                        AudioController.updateAudioStatus("AUDIO: READY");
+                        AudioController.isPlaying = false;
+                    };
+                    
+                    window.speechSynthesis.speak(speech);
+                }
+            });
+        }
+
+        // SPECIMEN ANALYSIS (Sound-out)
+        function soundOutDinoName() {
+            AudioController.playSoundWithContext(() => {
+                if (!soundEnabled) return;
+                
+                const dino = dinos[currentCardIndex];
+                const display = document.getElementById('soundoutDisplay');
+                const bubble = document.getElementById('soundoutText');
+                const instruction = document.getElementById('soundoutInstruction');
+                
+                // Show analysis interface
+                bubble.style.display = 'inline-block';
+                instruction.style.display = 'block';
+                
+                // Clear and rebuild display
+                display.innerHTML = '';
+                currentSoundOutParts = [];
+                
+                // Create analysis segments
+                dino.soundOut.forEach((part, index) => {
+                    const partDiv = document.createElement('div');
+                    partDiv.className = 'soundout-part';
+                    partDiv.textContent = part;
+                    partDiv.dataset.index = index;
+                    
+                    // Assign scientific colors
+                    const colors = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4'];
+                    partDiv.style.background = `linear-gradient(145deg, ${colors[index % colors.length]}, ${colors[(index + 1) % colors.length]})`;
+                    partDiv.style.borderColor = colors[(index + 2) % colors.length];
+                    
+                    partDiv.onclick = () => {
+                        AudioController.playSoundWithContext(() => {
+                            highlightSoundOutPart(index);
+                            speakSoundOutPart(part);
+                        });
+                    };
+                    
+                    display.appendChild(partDiv);
+                    currentSoundOutParts.push(partDiv);
+                    
+                    // Add separator (except last one)
+                    if (index < dino.soundOut.length - 1) {
+                        const space = document.createElement('div');
+                        space.className = 'soundout-part space';
+                        space.textContent = '•';
+                        space.style.color = '#94a3b8';
+                        space.style.minWidth = '10px';
+                        display.appendChild(space);
+                    }
+                });
+                
+                // Start analysis sequence
+                playAnalysisSequence();
+            });
+        }
+
+        function highlightSoundOutPart(index) {
+            currentSoundOutParts.forEach(part => {
+                if (part) part.classList.remove('active');
+            });
+            
+            if (currentSoundOutParts[index]) {
+                currentSoundOutParts[index].classList.add('active');
+            }
+        }
+
+        function speakSoundOutPart(text) {
+            if (!soundEnabled || !text) return;
+            
+            if ('speechSynthesis' in window) {
+                const speech = new SpeechSynthesisUtterance(text);
+                speech.rate = 0.9;
+                speech.pitch = 1.1;
+                speech.volume = 1;
+                window.speechSynthesis.speak(speech);
+            }
+        }
+
+        async function playAnalysisSequence() {
+            if (!soundEnabled) return;
+            
+            const dino = dinos[currentCardIndex];
+            
+            // Analysis sequence
+            document.getElementById('soundoutText').textContent = "INITIATING SPECIMEN ANALYSIS";
+            await speakWithJurassicVoice("Beginning specimen phonetic analysis.");
+            await delay(800);
+            
+            document.getElementById('soundoutText').textContent = "SPECIMEN: " + dino.name;
+            await speakWithJurassicVoice("Specimen designation: " + dino.name);
+            await delay(1000);
+            
+            document.getElementById('soundoutText').textContent = "PHONETIC BREAKDOWN";
+            await speakWithJurassicVoice("Phonetic breakdown:");
+            await delay(600);
+            
+            // Analyze each part
+            for (let i = 0; i < dino.soundOut.length; i++) {
+                highlightSoundOutPart(i);
+                await speakWithJurassicVoice(dino.soundOut[i]);
+                await delay(700);
+                
+                if (i === Math.floor(dino.soundOut.length / 2)) {
+                    await speakWithJurassicVoice("Analysis continuing.");
+                    await delay(400);
+                }
+            }
+            
+            // Clear highlighting
+            highlightSoundOutPart(-1);
+            await delay(500);
+            
+            // Complete analysis
+            document.getElementById('soundoutText').textContent = "ANALYSIS COMPLETE";
+            await speakWithJurassicVoice("Analysis complete. Specimen characteristics:");
+            await delay(600);
+            
+            for (const sound of dino.toddlerSounds) {
+                await speakWithJurassicVoice(sound);
+                await delay(800);
+            }
+            
+            // Final report
+            await delay(300);
+            await speakWithJurassicVoice("Specimen analysis concluded.");
+            document.getElementById('soundoutText').textContent = "ANALYSIS READY - CLICK SEGMENTS";
+            
+            AudioController.updateAudioStatus("AUDIO: READY");
+            AudioController.isPlaying = false;
+        }
+
+        function speakWithJurassicVoice(text) {
+            return new Promise((resolve) => {
+                if ('speechSynthesis' in window) {
+                    const speech = new SpeechSynthesisUtterance(text);
+                    speech.rate = 0.85;
+                    speech.pitch = 1.0;
+                    speech.volume = 1;
+                    
+                    speech.onend = resolve;
+                    speech.onerror = resolve;
+                    window.speechSynthesis.speak(speech);
+                } else {
+                    resolve();
+                }
+            });
+        }
+
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        // CARD FUNCTIONS - AUTO STOP AUDIO
+        function updateCard() {
+            // STOP ALL AUDIO FIRST - This is the key fix
+            AudioController.stopAllAudio();
+            
+            const dino = dinos[currentCardIndex];
+            const colors = jurassicColors[currentCardIndex];
+            
+            // Update card colors
+            const frontCard = document.querySelector('.card-front');
+            frontCard.style.background = `linear-gradient(135deg, ${colors.front[0]} 0%, ${colors.front[1]} 50%, ${colors.front[0]} 100%)`;
+            frontCard.style.borderColor = colors.border;
+            
+            document.getElementById('currentLetter').textContent = dino.letter;
+            document.getElementById('backLetter').textContent = dino.letter;
+            document.getElementById('currentName').textContent = dino.name;
+            document.getElementById('backName').textContent = dino.name;
+            document.getElementById('currentFact').textContent = dino.fact;
+            document.getElementById('currentDiet').textContent = dino.diet;
+            document.getElementById('currentIndex').textContent = currentCardIndex + 1;
+            document.getElementById('totalCards').textContent = dinos.length;
+            
+            // Update images with fallback
+            document.getElementById('frontImage').src = dino.image;
+            document.getElementById('backImage').src = dino.image;
+            
+            document.getElementById('flashcard').classList.remove('flipped');
+        }
+
+        function popDinosaur() {
+            AudioController.stopAllAudio();
+            
+            const images = document.querySelectorAll('.dino-image img');
+            images.forEach(img => {
+                img.classList.add('pop');
+                setTimeout(() => img.classList.remove('pop'), 500);
+            });
+        }
+
+        function nextCard() {
+            AudioController.stopAllAudio(); // STOP AUDIO FIRST
+            currentCardIndex = (currentCardIndex + 1) % dinos.length;
+            updateCard();
+        }
+
+        function prevCard() {
+            AudioController.stopAllAudio(); // STOP AUDIO FIRST
+            currentCardIndex = (currentCardIndex - 1 + dinos.length) % dinos.length;
+            updateCard();
+        }
+
+        function toggleSound() {
+            AudioController.stopAllAudio(); // STOP AUDIO FIRST
+            
+            soundEnabled = !soundEnabled;
+            const btn = document.getElementById('soundBtn');
+            if (soundEnabled) {
+                btn.innerHTML = '🔊 AUDIO ONLINE';
+                btn.style.background = 'linear-gradient(145deg, #059669, #10b981)';
+                btn.style.boxShadow = '0 4px 0 #047857';
+            } else {
+                btn.innerHTML = '🔇 AUDIO OFFLINE';
+                btn.style.background = 'linear-gradient(145deg, #dc2626, #ef4444)';
+                btn.style.boxShadow = '0 4px 0 #b91c1c';
+            }
+        }
+
+        // Flip card on click - AUTO STOP AUDIO
+        document.getElementById('flashcard').addEventListener('click', (e) => {
+            if (!e.target.closest('.dino-image') && !e.target.closest('.sound-btn') && !e.target.closest('.soundout-part')) {
+                AudioController.stopAllAudio(); // STOP AUDIO BEFORE FLIPPING
+                document.getElementById('flashcard').classList.toggle('flipped');
+            }
+        });
+
+        // Initialize
+        updateCard();
+        
+        // Initialize speech synthesis
+        if ('speechSynthesis' in window) {
+            speechSynthesis.getVoices();
+        }
+    </script>
+</body>
+</html>

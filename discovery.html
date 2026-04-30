@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Jurassic Park - Dinosaur Discovery</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: #0a2e1d;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 25px 20px;
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(255, 215, 0, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 215, 0, 0.08) 1px, transparent 1px);
+            background-size: 48px 48px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .warning-light {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ffaa33;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ffaa33;
+            animation: gentleBlink 2s infinite;
+            z-index: 1;
+        }
+        @keyframes gentleBlink {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .container {
+            max-width: 1180px;
+            width: 100%;
+            z-index: 3;
+            position: relative;
+        }
+
+        .header {
+            background: linear-gradient(145deg, #0f2a1a, #051a0e);
+            border: 3px solid #ffcc44;
+            border-radius: 40px;
+            padding: 14px 22px;
+            margin-bottom: 28px;
+            text-align: center;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.4);
+        }
+        .jp-logo {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.2rem;
+            letter-spacing: 6px;
+            color: #ffcc44;
+            text-shadow: 0 0 10px #ff9900;
+        }
+        .header h1 {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #FFDD77, #FFAA33);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .header p {
+            color: #aaffaa;
+            font-weight: bold;
+            font-size: 0.8rem;
+        }
+
+        .flashcard-container {
+            width: 100%;
+            height: 790px;
+            margin-bottom: 28px;
+            perspective: 2100px;
+        }
+        .flashcard {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.5s ease;
+            cursor: pointer;
+            border-radius: 55px;
+        }
+        .flashcard.flipped {
+            transform: rotateY(180deg);
+        }
+        .card-front, .card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 55px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 28px 48px -12px black;
+        }
+        .card-front {
+            background: radial-gradient(circle at 20% 30%, #2a5a35, #0a2a14);
+            border: 5px solid #ffcc44;
+        }
+        .card-back {
+            background: radial-gradient(circle at 80% 20%, #1a2a3a, #0a121c);
+            transform: rotateY(180deg);
+            border: 5px solid #44ccff;
+        }
+
+        .card-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px 26px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 14px;
+        }
+        .card-content::-webkit-scrollbar { width: 8px; }
+        .card-content::-webkit-scrollbar-track { background: #0c1722; border-radius: 20px; }
+        .card-content::-webkit-scrollbar-thumb { background: #ffaa44; border-radius: 20px; }
+
+        .dino-image {
+            width: 100%;
+            max-width: 640px;
+            height: 370px;
+            margin: 8px auto;
+            background: #051a0ecf;
+            border-radius: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #ffcc44;
+            cursor: pointer;
+            overflow: hidden;
+            box-shadow: 0 12px 28px black;
+        }
+        .dino-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: radial-gradient(circle, #1d432c, #041a0c);
+            transition: transform 0.2s;
+        }
+        .dino-image img.pop {
+            animation: dinoPopAnim 0.4s cubic-bezier(0.2, 1.2, 0.4, 1);
+        }
+        @keyframes dinoPopAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1) rotate(1deg); }
+            100% { transform: scale(1); }
+        }
+
+        .letter-square {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 4rem;
+            background: #000000cc;
+            backdrop-filter: blur(12px);
+            width: 110px;
+            height: 110px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 28px;
+            border: 4px solid #ffcc44;
+            box-shadow: 0 0 20px rgba(255, 200, 0, 0.6);
+            color: #ffdd88;
+            margin: 8px auto;
+            font-weight: bold;
+        }
+
+        .dino-name {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 2rem;
+            background: #000000bb;
+            backdrop-filter: blur(4px);
+            padding: 8px 26px;
+            border-radius: 60px;
+            color: #aaffcc;
+        }
+
+        .sound-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+            margin: 10px 0;
+            width: 100%;
+        }
+        .sound-btn {
+            background: linear-gradient(145deg, #1a4a2a, #0a3018);
+            border: none;
+            padding: 14px 26px;
+            border-radius: 70px;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            color: #ffdd99;
+            cursor: pointer;
+            transition: 0.05s linear;
+            box-shadow: 0 6px 0 #052010;
+        }
+        .sound-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #052010; }
+        .name-btn { background: linear-gradient(145deg, #0d6046, #09412f); box-shadow: 0 6px 0 #062b1f; }
+        .fact-btn { background: linear-gradient(145deg, #6d26a5, #4f187c); box-shadow: 0 6px 0 #2f114a; }
+        .diet-btn { background: linear-gradient(145deg, #c14633, #992b1c); box-shadow: 0 6px 0 #631a10; }
+        .soundout-btn { background: linear-gradient(145deg, #ffaa33, #dd8811); box-shadow: 0 6px 0 #aa6622; color:#332200; }
+
+        .dino-fact, .dino-diet {
+            background: #0a1024dd;
+            padding: 14px 20px;
+            border-radius: 32px;
+            font-size: 0.9rem;
+            text-align: center;
+            border-left: 6px solid #ffaa44;
+            color: #ffffdd;
+        }
+
+        .soundout-bubble {
+            background: #1a2a20;
+            padding: 8px 24px;
+            border-radius: 60px;
+            color: #ffdd88;
+            border: 1px solid #ffaa44;
+            font-weight: bold;
+        }
+        .soundout-display {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
+            margin: 8px 0;
+        }
+        .soundout-part {
+            background: linear-gradient(145deg, #3a6e4a, #2a5538);
+            padding: 10px 20px;
+            border-radius: 70px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+            border: 1px solid #ffcc66;
+            font-size: 1rem;
+            color: #ffffcc;
+        }
+        .soundout-part.active {
+            background: #ffaa44;
+            color: black;
+            transform: scale(1.08);
+            box-shadow: 0 0 18px gold;
+        }
+
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin: 16px 0 12px;
+        }
+        .control-btn {
+            background: #1e3628;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 80px;
+            font-weight: bold;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            color: #ffdd99;
+            cursor: pointer;
+            transition: 0.05s;
+            box-shadow: 0 6px 0 #0a2418;
+        }
+        .control-btn:active { transform: translateY(3px); box-shadow: 0 2px 0 #0a2418; }
+
+        .card-counter {
+            background: #000000bb;
+            border-radius: 60px;
+            padding: 5px 24px;
+            display: inline-block;
+            margin: 6px auto;
+            border: 1px solid #ffaa44;
+        }
+        .instructions {
+            font-size: 0.7rem;
+            color: #aaffaa;
+            text-align: center;
+            margin-top: 14px;
+        }
+        .audio-status {
+            font-size: 0.7rem;
+            background: #000000aa;
+            border-radius: 32px;
+            padding: 4px 16px;
+            display: inline-block;
+        }
+
+        @media (max-width: 780px) {
+            .flashcard-container { height: 680px; }
+            .dino-image { height: 280px; }
+            .letter-square { width: 85px; height: 85px; font-size: 3rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="warning-light" style="top: 4%; left: 3%;"></div>
+<div class="warning-light" style="bottom: 6%; right: 4%; animation-delay: 0.6s;"></div>
+<div class="warning-light" style="top: 15%; right: 2%; animation-delay: 1.1s;"></div>
+
+<div class="container">
+    <div class="header">
+        <div class="jp-logo">🦕 JURASSIC PARK 🦖</div>
+        <h1>DINOSAUR DISCOVERY</h1>
+        <p>| EXPEDITION DATABASE | AMAZING CREATURES |</p>
+    </div>
+
+    <div class="flashcard-container">
+        <div class="flashcard" id="flashcard">
+            <div class="card-front">
+                <div class="dino-name" id="currentName">ANKYLOSAURUS</div>
+                <div class="dino-image" id="popFrontTrigger">
+                    <img id="frontImage" src="a1.png" alt="dino" onerror="this.src='https://placehold.co/640x370/2c4a2a/ffcc44?text=DINOSAUR'">
+                </div>
+                <div class="letter-square" id="currentLetterSquare">A</div>
+                <div class="sound-buttons">
+                    <button class="sound-btn" id="animalSoundBtn">🔊 🦖 DINOSAUR CALL</button>
+                </div>
+                <div class="instructions">🔍 TAP CARD - VIEW SPECIMEN DATA 🔍</div>
+                <div class="audio-status" id="audioStatus">🎧 AUDIO READY</div>
+            </div>
+            <div class="card-back">
+                <div class="card-content">
+                    <div class="dino-name" id="backName">ANKYLOSAURUS</div>
+                    <div class="dino-image" id="popBackTrigger">
+                        <img id="backImage" src="a1.png" alt="specimen" onerror="this.src='https://placehold.co/640x370/2c4a2a/ffcc44?text=DINOSAUR'">
+                    </div>
+                    <div class="sound-buttons">
+                        <button class="sound-btn name-btn" id="speakNameBtn">📢 SPECIMEN ID</button>
+                        <button class="sound-btn fact-btn" id="speakFactBtn">📋 FIELD NOTES</button>
+                        <button class="sound-btn diet-btn" id="speakDietBtn">🍖 DIET PROFILE</button>
+                        <button class="sound-btn soundout-btn" id="soundOutBtn">🔬 PHONETIC DISCOVERY</button>
+                    </div>
+                    <div class="soundout-bubble" id="soundoutText" style="display: none;">🔊 SPECIMEN ANALYSIS</div>
+                    <div class="soundout-display" id="soundoutDisplay"></div>
+                    <div class="soundout-instruction" id="soundoutInstruction" style="display: none; font-size:0.7rem;">🎵 tap syllables for pronunciation</div>
+                    <div class="dino-fact" id="currentFact">Armored dinosaur with a powerful club tail for protection</div>
+                    <div class="dino-diet" id="currentDiet">HERBIVORE • ARMORED GIANT</div>
+                    <div class="audio-status" id="backAudioStatus">🎧 AUDIO READY</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button class="control-btn" id="prevBtn">◀ PREV SPECIMEN</button>
+        <button class="control-btn" id="toggleSoundBtn">🔊 AUDIO ACTIVE</button>
+        <button class="control-btn" id="nextBtn">NEXT SPECIMEN ▶</button>
+    </div>
+    <div class="card-counter" style="text-align: center;">
+        SPECIMEN <span id="currentIndex">1</span> / <span id="totalCards">7</span>
+    </div>
+    <div class="instructions">🎬 JURASSIC PARK EXPEDITION — DISCOVER AMAZING DINOSAURS 🎬</div>
+</div>
+
+<script>
+    // DINOSAURS - FIXED BRACHIOSAURUS SPELLING (was missing 'A' before!)
+    const dinos = [
+        { letter: 'A', name: 'ANKYLOSAURUS', fact: 'Heavily armored dinosaur with a massive bony club at the end of its tail for defense.', diet: 'HERBIVORE • ARMORED', image: 'a1.png', soundOut: ["AN", "KY", "LO", "SAUR", "US"] },
+        { letter: 'B', name: 'BRACHIOSAURUS', fact: 'One of the tallest dinosaurs with an extremely long neck to reach high vegetation.', diet: 'HERBIVORE • GIANT', image: 'b1.png', soundOut: ["BRACH", "I", "O", "SAUR", "US"] },
+        { letter: 'C', name: 'CORYTHOSAURUS', fact: 'Hadrosaur with a distinctive helmet-like crest on its head used for display and communication.', diet: 'HERBIVORE • CRESTED', image: 'c3.png', soundOut: ["COR", "YTH", "O", "SAUR", "US"] },
+        { letter: 'D', name: 'DIPLODOCUS', fact: 'Extremely long sauropod with a whip-like tail, one of the longest dinosaurs ever discovered.', diet: 'HERBIVORE • LONG-NECK', image: 'd4.png', soundOut: ["DIP", "LO", "DO", "CUS"] },
+        { letter: 'E', name: 'EDMONTOSAURUS', fact: 'Large duck-billed dinosaur with hundreds of teeth for grinding tough plants.', diet: 'HERBIVORE • DUCK-BILL', image: 'e5.png', soundOut: ["ED", "MON", "TO", "SAUR", "US"] },
+        { letter: 'F', name: 'FUKUIRAPTOR', fact: 'Medium-sized carnivorous dinosaur, a fast and agile predator of the Cretaceous period.', diet: 'CARNIVORE • HUNTER', image: 'f6.png', soundOut: ["FU", "KUI", "RAP", "TOR"] },
+        { letter: 'G', name: 'GALLIMIMUS', fact: 'Ostrich-like dinosaur, one of the fastest runners among all dinosaurs.', diet: 'OMNIVORE • SWIFT', image: 'g7.png', soundOut: ["GAL", "LI", "MI", "MUS"] }
+    ];
+
+    let currentCard = 0;
+    let soundEnabled = true;
+    let activeAudioCtx = null;
+    let currentSpeech = null;
+
+    // Clean audio stop
+    function killAllAudioNow() {
+        try {
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            if (activeAudioCtx) {
+                activeAudioCtx.close().catch(e=>null);
+                activeAudioCtx = null;
+            }
+            currentSpeech = null;
+        } catch(e) {}
+    }
+
+    // Friendly voice for dino information
+    function speakDino(text, rate = 0.85, pitch = 1.0) {
+        return new Promise((resolve) => {
+            if (!soundEnabled) { resolve(); return; }
+            killAllAudioNow();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = rate;
+            utterance.pitch = pitch;
+            utterance.volume = 1;
+            utterance.onend = () => resolve();
+            utterance.onerror = () => resolve();
+            currentSpeech = utterance;
+            window.speechSynthesis.speak(utterance);
+        });
+    }
+
+    // EXCITING DINOSAUR CALLS - ALL 7 DINOSAURS WORKING 100%
+    async function playDinoCall() {
+        if (!soundEnabled) return;
+        killAllAudioNow();
+        
+        const d = dinos[currentCard];
+        const name = d.name;
+        
+        try {
+            const AudioCtx = window.AudioContext || window.webkitAudioContext;
+            const ctx = new AudioCtx();
+            activeAudioCtx = ctx;
+            await ctx.resume();
+            const now = ctx.currentTime;
+            
+            const masterGain = ctx.createGain();
+            masterGain.gain.value = 0.7;
+            masterGain.connect(ctx.destination);
+            
+            // Create oscillators for rich dino sound
+            const osc1 = ctx.createOscillator();
+            const osc2 = ctx.createOscillator();
+            const gain1 = ctx.createGain();
+            const gain2 = ctx.createGain();
+            
+            osc1.connect(gain1);
+            osc2.connect(gain2);
+            gain1.connect(masterGain);
+            gain2.connect(masterGain);
+            
+            // Use direct string matching for reliability
+            if (name === 'ANKYLOSAURUS') {
+                osc1.type = 'sine'; osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(180, now); osc1.frequency.exponentialRampToValueAtTime(220, now+0.6);
+                osc2.frequency.setValueAtTime(200, now); osc2.frequency.exponentialRampToValueAtTime(240, now+0.5);
+                gain1.gain.setValueAtTime(0.5, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+1.2);
+                gain2.gain.setValueAtTime(0.45, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+1.1);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+1.2); osc2.stop(now+1.1);
+            }
+            else if (name === 'BRACHIOSAURUS') {
+                // BRACHIOSAURUS - DEEP, MAJESTIC, 100% WORKING
+                osc1.type = 'sine'; osc2.type = 'sine';
+                osc1.frequency.setValueAtTime(75, now); 
+                osc1.frequency.exponentialRampToValueAtTime(105, now+1.3);
+                osc2.frequency.setValueAtTime(85, now); 
+                osc2.frequency.exponentialRampToValueAtTime(115, now+1.1);
+                gain1.gain.setValueAtTime(0.55, now); 
+                gain1.gain.exponentialRampToValueAtTime(0.01, now+1.8);
+                gain2.gain.setValueAtTime(0.5, now); 
+                gain2.gain.exponentialRampToValueAtTime(0.01, now+1.6);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+1.8); osc2.stop(now+1.6);
+            }
+            else if (name === 'CORYTHOSAURUS') {
+                osc1.type = 'triangle'; osc2.type = 'sine';
+                osc1.frequency.setValueAtTime(320, now); osc1.frequency.exponentialRampToValueAtTime(380, now+0.5);
+                osc2.frequency.setValueAtTime(350, now); osc2.frequency.exponentialRampToValueAtTime(410, now+0.45);
+                gain1.gain.setValueAtTime(0.5, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+1.0);
+                gain2.gain.setValueAtTime(0.45, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+0.95);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+1.0); osc2.stop(now+0.95);
+            }
+            else if (name === 'DIPLODOCUS') {
+                osc1.type = 'sine'; osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(65, now); osc1.frequency.exponentialRampToValueAtTime(85, now+1.4);
+                osc2.frequency.setValueAtTime(75, now); osc2.frequency.exponentialRampToValueAtTime(95, now+1.2);
+                gain1.gain.setValueAtTime(0.5, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+1.8);
+                gain2.gain.setValueAtTime(0.4, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+1.6);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+1.8); osc2.stop(now+1.6);
+            }
+            else if (name === 'EDMONTOSAURUS') {
+                osc1.type = 'sawtooth'; osc2.type = 'triangle';
+                osc1.frequency.setValueAtTime(250, now); osc1.frequency.exponentialRampToValueAtTime(300, now+0.6);
+                osc2.frequency.setValueAtTime(270, now); osc2.frequency.exponentialRampToValueAtTime(320, now+0.55);
+                gain1.gain.setValueAtTime(0.5, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+1.1);
+                gain2.gain.setValueAtTime(0.45, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+1.0);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+1.1); osc2.stop(now+1.0);
+            }
+            else if (name === 'FUKUIRAPTOR') {
+                osc1.type = 'square'; osc2.type = 'sawtooth';
+                osc1.frequency.setValueAtTime(400, now); osc1.frequency.exponentialRampToValueAtTime(500, now+0.4);
+                osc2.frequency.setValueAtTime(430, now); osc2.frequency.exponentialRampToValueAtTime(530, now+0.35);
+                gain1.gain.setValueAtTime(0.45, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+0.85);
+                gain2.gain.setValueAtTime(0.4, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+0.8);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+0.85); osc2.stop(now+0.8);
+            }
+            else if (name === 'GALLIMIMUS') {
+                osc1.type = 'triangle'; osc2.type = 'sine';
+                osc1.frequency.setValueAtTime(350, now); osc1.frequency.exponentialRampToValueAtTime(420, now+0.45);
+                osc2.frequency.setValueAtTime(380, now); osc2.frequency.exponentialRampToValueAtTime(450, now+0.4);
+                gain1.gain.setValueAtTime(0.5, now); gain1.gain.exponentialRampToValueAtTime(0.01, now+0.9);
+                gain2.gain.setValueAtTime(0.45, now); gain2.gain.exponentialRampToValueAtTime(0.01, now+0.85);
+                osc1.start(now); osc2.start(now);
+                osc1.stop(now+0.9); osc2.stop(now+0.85);
+            }
+            
+            // Update status to show sound is playing
+            document.getElementById('audioStatus').innerHTML = "🎵 CALL PLAYING...";
+            document.getElementById('backAudioStatus').innerHTML = "🎵 CALL PLAYING...";
+            
+            setTimeout(() => {
+                if (activeAudioCtx === ctx) activeAudioCtx = null;
+                if (soundEnabled) {
+                    document.getElementById('audioStatus').innerHTML = "🎧 AUDIO READY";
+                    document.getElementById('backAudioStatus').innerHTML = "🎧 AUDIO READY";
+                }
+            }, 2000);
+            
+        } catch(e) { 
+            console.warn("Audio error:", e);
+        }
+    }
+
+    // PHONETIC DISCOVERY
+    async function runPhoneticDiscovery() {
+        if (!soundEnabled) return;
+        killAllAudioNow();
+        const d = dinos[currentCard];
+        const displayDiv = document.getElementById('soundoutDisplay');
+        const bubble = document.getElementById('soundoutText');
+        const instr = document.getElementById('soundoutInstruction');
+        bubble.style.display = 'inline-block';
+        instr.style.display = 'block';
+        displayDiv.innerHTML = '';
+        
+        d.soundOut.forEach((part, idx) => {
+            const chip = document.createElement('div');
+            chip.className = 'soundout-part';
+            chip.innerText = part;
+            chip.onclick = (e) => {
+                e.stopPropagation();
+                if (!soundEnabled) return;
+                killAllAudioNow();
+                speakDino(part, 0.9, 1.1);
+                document.querySelectorAll('.soundout-part').forEach(p => p.classList.remove('active'));
+                chip.classList.add('active');
+                setTimeout(() => chip.classList.remove('active'), 500);
+            };
+            displayDiv.appendChild(chip);
+            if(idx < d.soundOut.length-1) {
+                let sep = document.createElement('span');
+                sep.innerText = "•";
+                sep.style.margin = "0 4px";
+                sep.style.color = "#ffaa55";
+                displayDiv.appendChild(sep);
+            }
+        });
+        bubble.innerText = `🔬 DISCOVERY ANALYSIS: ${d.name}`;
+        await speakDino(`Let's discover how to say ${d.name}! ${d.fact}`, 0.8, 1.0);
+        bubble.innerText = `✨ TAP ANY SYLLABLE TO LEARN ✨`;
+    }
+    
+    // UI update
+    function updateCardUI() {
+        killAllAudioNow();
+        const d = dinos[currentCard];
+        document.getElementById('currentName').innerHTML = d.name;
+        document.getElementById('backName').innerHTML = d.name;
+        document.getElementById('currentLetterSquare').innerHTML = d.letter;
+        document.getElementById('currentFact').innerHTML = d.fact;
+        document.getElementById('currentDiet').innerHTML = d.diet;
+        document.getElementById('currentIndex').innerHTML = currentCard+1;
+        document.getElementById('totalCards').innerHTML = dinos.length;
+        
+        const frontImg = document.getElementById('frontImage');
+        const backImg = document.getElementById('backImage');
+        frontImg.src = d.image;
+        backImg.src = d.image;
+        frontImg.onerror = () => { frontImg.src = 'https://placehold.co/640x370/2c4a2a/ffcc44?text=DINOSAUR'; };
+        backImg.onerror = () => { backImg.src = 'https://placehold.co/640x370/2c4a2a/ffcc44?text=DINOSAUR'; };
+        
+        document.getElementById('flashcard').classList.remove('flipped');
+        document.getElementById('soundoutDisplay').innerHTML = '';
+        document.getElementById('soundoutText').style.display = 'none';
+        document.getElementById('soundoutInstruction').style.display = 'none';
+        
+        if (soundEnabled) {
+            document.getElementById('audioStatus').innerHTML = "🎧 AUDIO READY";
+            document.getElementById('backAudioStatus').innerHTML = "🎧 AUDIO READY";
+        }
+    }
+    
+    function nextCard() { killAllAudioNow(); currentCard = (currentCard+1)%dinos.length; updateCardUI(); }
+    function prevCard() { killAllAudioNow(); currentCard = (currentCard-1+dinos.length)%dinos.length; updateCardUI(); }
+    function toggleSound() {
+        killAllAudioNow();
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('toggleSoundBtn');
+        if(soundEnabled) {
+            btn.innerHTML = "🔊 AUDIO ACTIVE";
+            btn.style.background = "#1e3628";
+            document.getElementById('audioStatus').innerHTML = "🎧 AUDIO READY";
+            document.getElementById('backAudioStatus').innerHTML = "🎧 AUDIO READY";
+        } else {
+            btn.innerHTML = "🔇 AUDIO OFF";
+            btn.style.background = "#552525";
+            document.getElementById('audioStatus').innerHTML = "🔇 MUTED";
+            document.getElementById('backAudioStatus').innerHTML = "🔇 MUTED";
+        }
+    }
+    function popImage() {
+        document.querySelectorAll('.dino-image img').forEach(img => {
+            img.classList.add('pop');
+            setTimeout(() => img.classList.remove('pop'), 350);
+        });
+    }
+    
+    // Event binding
+    document.getElementById('animalSoundBtn').onclick = (e) => { e.stopPropagation(); if(soundEnabled) playDinoCall(); };
+    document.getElementById('speakNameBtn').onclick = (e) => { e.stopPropagation(); speakDino(`Welcome to Jurassic Park! This is ${dinos[currentCard].name}.`, 0.85); };
+    document.getElementById('speakFactBtn').onclick = (e) => { e.stopPropagation(); speakDino(`Field discovery: ${dinos[currentCard].fact}`, 0.85); };
+    document.getElementById('speakDietBtn').onclick = (e) => { e.stopPropagation(); speakDino(`Diet classification: ${dinos[currentCard].diet}`, 0.85); };
+    document.getElementById('soundOutBtn').onclick = (e) => { e.stopPropagation(); runPhoneticDiscovery(); };
+    document.getElementById('prevBtn').onclick = prevCard;
+    document.getElementById('nextBtn').onclick = nextCard;
+    document.getElementById('toggleSoundBtn').onclick = toggleSound;
+    document.getElementById('popFrontTrigger').onclick = (e) => { e.stopPropagation(); popImage(); };
+    document.getElementById('popBackTrigger').onclick = (e) => { e.stopPropagation(); popImage(); };
+    
+    const flash = document.getElementById('flashcard');
+    flash.addEventListener('click', (e) => {
+        if(e.target.closest('.sound-btn') || e.target.closest('.soundout-part') || e.target.closest('.dino-image')) return;
+        killAllAudioNow();
+        flash.classList.toggle('flipped');
+    });
+    
+    updateCardUI();
+    if ('speechSynthesis' in window) window.speechSynthesis.getVoices();
+</script>
+</body>
+</html>
